@@ -1,26 +1,23 @@
 import streamlit as st
 import pandas as pd
 from datetime import datetime
-import mysql.connector
+from sqlalchemy import create_engine
 
 # CONFIG
 st.set_page_config(page_title="Dashboard Vencimientos", layout="wide")
 
 # CONEXIÓN DB
 @st.cache_resource
-def get_connection():
-    return mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="Kevinmoreno31416",
-        database="vencimientos_db"
+def get_engine():
+    return create_engine(
+        "postgresql+psycopg2://postgres:Kevinmoreno31416@localhost:5433/Vencimientos"
     )
 
-mydb = get_connection()
+engine = get_engine()
 
 # LEER DATOS
 try:
-    df = pd.read_sql("SELECT * FROM equipos", mydb)
+    df = pd.read_sql("SELECT * FROM equipos", engine)
 except Exception as e:
     st.error(f"Error al conectar con la base de datos: {e}")
     st.stop()
