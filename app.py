@@ -10,7 +10,8 @@ st.set_page_config(page_title="Dashboard Vencimientos", layout="wide")
 @st.cache_resource
 def get_engine():
     return create_engine(
-        "postgresql+psycopg2://postgres:Kevinmoreno31416@localhost:5433/Vencimientos"
+        st.secrets["DB_URL"],
+        connect_args={"sslmode": "require"}
     )
 
 engine = get_engine()
