@@ -56,13 +56,17 @@ def enviar_correo(asunto, html):
 # =========================
 if not alertas_20.empty:
 
-    html = "<h2>⚠️ Equipos por vencer (20 días)</h2><ul>"
+    html = """
+    <h2 style ="color:red;">⚠️ Equipos por vencer (20 días)</h2><ul>
+    <table border="1" cellpadding="5" cellspacing="0"> <tr> <th>Empresa</th> <th>Fecha</th> <th>Días restantes</th> </tr> """
+    
 
     for _, row in alertas_20.iterrows():
-        html += f"<li>{row['tenant']} - {row['dias_restantes']} días</li>"
-
-    html += "</ul>"
-
+        html += f"""
+        <tr> <td>{row['tenant']}</td> <td>{row['fecha_vencimiento']}</td> <td>{row['dias_restantes']}</td> </tr>
+        """
+    html += "</table>"
+    
     enviar_correo("⚠️ Alerta 20 días", html)
 
     ids = ",".join(map(str, alertas_20["id"].tolist()))
