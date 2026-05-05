@@ -44,13 +44,13 @@ if opcion == "Dashboard":
 
     # KPIs
     total = len(df)
-    por_vencer = len(df[df["dias_restantes"].between(0, 5)])
+    por_vencer = len(df[df["dias_restantes"].between(0, 20)])
     vencidos = len(df[df["dias_restantes"] < 0])
 
     col1, col2, col3 = st.columns(3)
 
     col1.metric("Total registros", total)
-    col2.metric("Por vencer (5 dias)", por_vencer)
+    col2.metric("Por vencer (20 dias)", por_vencer)
     col3.metric("Vencidos", vencidos)
 
     # GRÁFICA
@@ -58,8 +58,8 @@ if opcion == "Dashboard":
     st.bar_chart(df["dias_restantes"])
 
     # ALERTAS
-    st.subheader("🚨 Alerta para vencer (5 días)")
-    alertas = (df[df["dias_restantes"].between(0, 5)])
+    st.subheader("🚨 Alerta para vencer (20 días)")
+    alertas = (df[df["dias_restantes"].between(0, 20)])
 
     if not alertas.empty:
         st.error("Hay elementos próximos a vencer")
