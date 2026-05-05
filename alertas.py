@@ -21,7 +21,7 @@ df["dias_restantes"] = (df["fecha_vencimiento"] - hoy).dt.days
 # =========================
 alertas_20 = df[
     (df["dias_restantes"].between(6, 20)) &
-    (df["alerta_20"] == 0)
+    (df["alerta_20"].fillna(False)== False)
 ]
 
 # =========================
@@ -29,7 +29,7 @@ alertas_20 = df[
 # =========================
 alertas_5 = df[
     (df["dias_restantes"].between(0, 5)) &
-    (df["alerta_5"] == 0)
+    (df["alerta_5"].fillna(False)== False)
 ]
 
 # =========================
@@ -69,7 +69,7 @@ if not alertas_20.empty:
 
     with engine.begin() as conn:
         conn.execute(text(f"""
-            UPDATE equipos SET alerta_20 = 1
+            UPDATE equipos SET alerta_20 = TRUE
             WHERE id IN ({ids})
         """))
 
@@ -91,7 +91,7 @@ if not alertas_5.empty:
 
     with engine.begin() as conn:
         conn.execute(text(f"""
-            UPDATE equipos SET alerta_5 = 1
+            UPDATE equipos SET alerta_5 = TRUE
             WHERE id IN ({ids})
         """))
 
