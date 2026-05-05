@@ -14,7 +14,7 @@ df = pd.read_sql("SELECT * FROM equipos", engine)
 df["fecha_vencimiento"] = pd.to_datetime(df["fecha_vencimiento"], errors="coerce")
 
 hoy = datetime.now()
-df["dias_restantes"] = (df["fecha_vencimiento"] - hoy).dt.days
+df["dias_restantes"] = (df["fecha_vencimiento"] - hoy).dt.days.astype("Int64")
 
 # =========================
 # ALERTA 20 DÍAS
@@ -66,7 +66,7 @@ if not alertas_20.empty:
         <tr> <td>{row['tenant']}</td> <td>{row['fecha_vencimiento']}</td> <td>{row['dias_restantes']}</td> </tr>
         """
     html += "</table>"
-    
+
     enviar_correo("⚠️ Alerta 20 días", html)
 
     ids = ",".join(map(str, alertas_20["id"].tolist()))
@@ -82,12 +82,17 @@ if not alertas_20.empty:
 # =========================
 if not alertas_5.empty:
 
-    html = "<h2 style='color:red;'>🚨 URGENTE (5 días)</h2><ul>"
+    html = """
+    <h2 style ="color:red;">🚨 Equipos por vencer (5 días)</h2><ul>
+    <table border="1" cellpadding="5" cellspacing="0"> <tr> <th>Empresa</th> <th>Fecha</th> <th>Días restantes</th> </tr> """
+
 
     for _, row in alertas_5.iterrows():
-        html += f"<li>{row['tenant']} - {row['dias_restantes']} días</li>"
+       html += f"""
+        <tr> <td>{row['tenant']}</td> <td>{row['fecha_vencimiento']}</td> <td>{row['dias_restantes']}</td> </tr>
+        """
 
-    html += "</ul>"
+    html += "</table>"
 
     enviar_correo("🚨 URGENTE: 5 días", html)
 
