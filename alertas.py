@@ -16,34 +16,26 @@ df["fecha_vencimiento"] = pd.to_datetime(df["fecha_vencimiento"], errors="coerce
 hoy = datetime.now()
 df["dias_restantes"] = (df["fecha_vencimiento"] - hoy).dt.days
 
-alertas = df[
-    (df["dias_restantes"].between(0, 20)) &
-    (df["alerta_enviada"] == 0)
+# =========================
+# ALERTA 20 DÍAS
+# =========================
+alertas_20 = df[
+    (df["dias_restantes"].between(6, 20)) &
+    (df["alerta_20"] == 0)
 ]
 
-if not alertas.empty:
+# =========================
+# ALERTA 5 DÍAS
+# =========================
+alertas_5 = df[
+    (df["dias_restantes"].between(0, 5)) &
+    (df["alerta_5"] == 0)
+]
 
-    html = """
-    <h2 style="color:red;">⚠️ Equipos por vencer</h2>
-    <table border="1" cellpadding="5" cellspacing="0">
-        <tr>
-            <th>Empresa</th>
-            <th>Fecha</th>
-            <th>Días restantes</th>
-        </tr>
-    """
-
-    for _, row in alertas.iterrows():
-        html += f"""
-        <tr>
-            <td>{row['tenant']}</td>
-            <td>{row['fecha_vencimiento']}</td>
-            <td>{row['dias_restantes']}</td>
-        </tr>
-        """
-
-    html += "</table>"
-
+# =========================
+# FUNCIÓN PARA ENVIAR
+# =========================
+def enviar_correo(asunto, html):
     response = requests.post(
         "https://api.resend.com/emails",
         headers={
@@ -52,24 +44,55 @@ if not alertas.empty:
         },
         json={
             "from": "onboarding@resend.dev",
-            "to": "morenoramirezkevinjose@gmail.com",
-            "subject": "⚠️ Equipos por vencer",
+            "to": ["morenoramirezkevinjose@gmail.com"],
+            "subject": asunto,
             "html": html,
         },
     )
-
     print(response.json())
 
-    ids = ",".join(map(str, alertas["id"].tolist()))
+# =========================
+# PROCESAR ALERTA 20
+# =========================
+if not alertas_20.empty:
+
+    html = "<h2>⚠️ Equipos por vencer (20 días)</h2><ul>"
+
+    for _, row in alertas_20.iterrows():
+        html += f"<li>{row['tenant']} - {row['dias_restantes']} días</li>"
+
+    html += "</ul>"
+
+    enviar_correo("⚠️ Alerta 20 días", html)
+
+    ids = ",".join(map(str, alertas_20["id"].tolist()))
 
     with engine.begin() as conn:
         conn.execute(text(f"""
-            UPDATE equipos
-            SET alerta_enviada = 1
+            UPDATE equipos SET alerta_20 = 1
             WHERE id IN ({ids})
         """))
 
-    print("Correos enviados correctamente")
+# =========================
+# PROCESAR ALERTA 5
+# =========================
+if not alertas_5.empty:
 
-else:
-    print("Sin alertas")
+    html = "<h2 style='color:red;'>🚨 URGENTE (5 días)</h2><ul>"
+
+    for _, row in alertas_5.iterrows():
+        html += f"<li>{row['tenant']} - {row['dias_restantes']} días</li>"
+
+    html += "</ul>"
+
+    enviar_correo("🚨 URGENTE: 5 días", html)
+
+    ids = ",".join(map(str, alertas_5["id"].tolist()))
+
+    with engine.begin() as conn:
+        conn.execute(text(f"""
+            UPDATE equipos SET alerta_5 = 1
+            WHERE id IN ({ids})
+        """))
+
+print("Proceso terminado")
