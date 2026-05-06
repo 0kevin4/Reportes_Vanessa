@@ -44,7 +44,7 @@ def enviar_correo(asunto, html):
         },
         json={
             "from": "onboarding@resend.dev",
-            "to": "vanessithamore@gmail.com",
+            "to": "wendy.moreno@claro.com.co",
             "subject": asunto,
             "html": html,
         },
@@ -57,7 +57,7 @@ def enviar_correo(asunto, html):
 if not alertas_20.empty:
 
     html = """
-    <h2 style ="color:red;">⚠️ Equipos por vencer (20 días)</h2><ul>
+    <h2 style ="color:red;"Equipos por vencer (20 días)</h2><ul>
     <table border="1" cellpadding="5" cellspacing="0"> <tr> <th>Empresa</th> <th>Fecha</th> <th>Días restantes</th> </tr> """
     
 
@@ -67,7 +67,7 @@ if not alertas_20.empty:
         """
     html += "</table>"
 
-    enviar_correo("⚠️ Alerta 20 días", html)
+    enviar_correo("Alerta 20 días para vencer", html)
 
     ids = ",".join(map(str, alertas_20["id"].tolist()))
 
@@ -83,7 +83,7 @@ if not alertas_20.empty:
 if not alertas_5.empty:
 
     html = """
-    <h2 style ="color:red;">🚨 Equipos por vencer (5 días)</h2><ul>
+    <h2 style ="color:red;">Equipos por vencer (5 días)</h2><ul>
     <table border="1" cellpadding="5" cellspacing="0"> <tr> <th>Empresa</th> <th>Fecha</th> <th>Días restantes</th> </tr> """
 
 
@@ -94,7 +94,7 @@ if not alertas_5.empty:
 
     html += "</table>"
 
-    enviar_correo("🚨 URGENTE: 5 días", html)
+    enviar_correo("URGENTE: 5 días para vencer", html)
 
     ids = ",".join(map(str, alertas_5["id"].tolist()))
 
