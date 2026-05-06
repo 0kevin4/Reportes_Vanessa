@@ -44,7 +44,7 @@ def enviar_correo(asunto, html):
         },
         json={
             "from": "onboarding@resend.dev",
-            "to": ["wendy.moreno@claro.com.co"],
+            "to": ["vanessithamore@gmail.com"],
             "subject": asunto,
             "html": html,
         },
